@@ -1,46 +1,48 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraMove : MonoBehaviour
+public class CameraController : MonoBehaviour
 {
+    public Transform playerTransform;
+    private Vector3 cameraOffset;
+    public float smoothFactor = 0.5f;
+    public bool lookAtPlayer = false;
+    public bool rotateAroundPlayer = true;
+    public float rotationSpeed = 5.0f;
+    public LayerMask obstructionLayer; // Define which layers count as obstructions
 
-    private const float YMin = -50.0f;
-    private const float YMax = 50.0f;
-
-    public Transform lookAt;
-
-    public Transform Player;
-
-    public float distance = 10.0f;
-    private float currentX = 0.0f;
-    private float currentY = 0.0f;
-    public float sensivity = 4.0f;
-
-
-    // Start is called before the first frame update
     void Start()
     {
-
-
+        cameraOffset = transform.position - playerTransform.position;
     }
 
-    // Update is called once per frame
     void LateUpdate()
     {
+        if (rotateAroundPlayer)
+        {
+            // Horizontal rotation
+            Quaternion camTurnAngleHorizontal = Quaternion.AngleAxis(Input.GetAxis("Mouse X") * rotationSpeed, Vector3.up);
+            // Vertical rotation
+            Quaternion camTurnAngleVertical = Quaternion.AngleAxis(-Input.GetAxis("Mouse Y") * rotationSpeed, transform.right);
+            // Combine rotations and apply to the camera offset
+            cameraOffset = camTurnAngleHorizontal * camTurnAngleVertical * cameraOffset;
+        }
 
-        currentX += Input.GetAxis("Mouse X") * sensivity * Time.deltaTime;
-        currentY -= Input.GetAxis("Mouse Y") * sensivity * Time.deltaTime;
+        // Update camera position and adjust for obstructions
+        Vector3 newPos = playerTransform.position + cameraOffset;
+        CheckCameraObstruction(ref newPos);
 
-        currentY = Mathf.Clamp(currentY, YMin, YMax);
+        transform.position = Vector3.Slerp(transform.position, newPos, smoothFactor);
 
-        Vector3 Direction = new Vector3(0, 0, -distance);
-        Quaternion rotation = Quaternion.Euler(currentY, currentX, 0);
-        transform.position = lookAt.position + rotation * Direction;
+        if (lookAtPlayer || rotateAroundPlayer)
+            transform.LookAt(playerTransform);
+    }
 
-        transform.LookAt(lookAt.position);
-
-
-
+    private void CheckCameraObstruction(ref Vector3 targetPos)
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(playerTransform.position, targetPos - playerTransform.position, out hit, cameraOffset.magnitude, obstructionLayer))
+        {
+            targetPos = playerTransform.position + (targetPos - playerTransform.position).normalized * (hit.distance - 0.5f); // Move camera forward slightly before the hit point
+        }
     }
 }

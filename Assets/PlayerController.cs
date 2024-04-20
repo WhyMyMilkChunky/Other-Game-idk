@@ -1,43 +1,50 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerMove : MonoBehaviour
+public class ThirdPersonCharacterController : MonoBehaviour
 {
-    CharacterController Controller;
-    public float Speed;
-    public float Gravity = -9.81f; // Gravity value
-    public Transform Cam;
+   
+    private CharacterController controller;
+    private Vector3 playerVelocity;
+    private bool groundedPlayer;
+    public float playerSpeed = 2.0f;
+    public Transform cameraTransform; // Reference to the camera's transform
 
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-        Controller = GetComponent<CharacterController>();
+        controller = gameObject.GetComponent<CharacterController>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        float Horizontal = Input.GetAxis("Horizontal") * Speed * Time.deltaTime;
-        float Vertical = Input.GetAxis("Vertical") * Speed * Time.deltaTime;
+        groundedPlayer = controller.isGrounded;
+        if (groundedPlayer && playerVelocity.y < 0)
+        {
+            playerVelocity.y = 0f;
+        }
 
-        Vector3 Movement = Cam.transform.right * Horizontal + Cam.transform.forward * Vertical;
-        Movement.y = 0f;
+        // Get input from the horizontal and vertical axes (keyboard or controller)
+        Vector3 inputDirection = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")).normalized;
+
+        // Transform input vector into world space relative to the camera orientation
+        Vector3 move = cameraTransform.forward * inputDirection.z + cameraTransform.right * inputDirection.x;
+        move.y = 0; // Ensure movement is strictly horizontal
+
+        controller.Move(move * Time.deltaTime * playerSpeed);
+
+        // Rotate towards the movement direction using the look rotation vector
+        if (move != Vector3.zero)
+        {
+            gameObject.transform.forward = move;
+        }
+
+        // Jump mechanics
+        if (Input.GetButtonDown("Jump") && groundedPlayer)
+        {
+            playerVelocity.y += Mathf.Sqrt(0.3f * 3.0f * -3.0f);
+        }
 
         // Apply gravity
-        Movement.y += Gravity * Time.deltaTime;
-
-        Controller.Move(Movement);
-
-        if (Movement.magnitude != 0f)
-        {
-            transform.Rotate(Vector3.up * Input.GetAxis("Mouse X") * Cam.GetComponent<CameraMove>().sensivity * Time.deltaTime);
-
-            Quaternion CamRotation = Cam.rotation;
-            CamRotation.x = 0f;
-            CamRotation.z = 0f;
-
-            transform.rotation = Quaternion.Lerp(transform.rotation, CamRotation, 0.1f);
-        }
+        playerVelocity.y += -3.0f * Time.deltaTime;
+        controller.Move(playerVelocity * Time.deltaTime);
     }
 }

@@ -149,7 +149,7 @@ Transform:
   m_GameObject: {fileID: 222437663}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.865, y: 2.283, z: 0}
+  m_LocalPosition: {x: 0, y: 2.388, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -242,8 +242,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.51, y: -3.7539997, z: -3.4850006}
+  m_LocalRotation: {x: -0.000000081460335, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 6.39, z: -4.97}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -306,10 +306,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 822ae84d4aea46442b462563600df158, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lookAt: {fileID: 222437664}
-  Player: {fileID: 8835002954186025952}
-  distance: 5.53
-  sensivity: 1000
+  playerTransform: {fileID: 222437664}
+  smoothFactor: 0.5
+  lookAtPlayer: 0
+  rotateAroundPlayer: 1
+  rotationSpeed: 5
+  obstructionLayer:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -914,7 +918,7 @@ GameObject:
   - component: {fileID: 7797571940858781029}
   - component: {fileID: 4432877787920556424}
   - component: {fileID: 7797571940858781030}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Plane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1584,16 +1588,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08d20c7cd31876544b50372c282d1ad3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Speed: 4
-  Gravity: -9.81
-  Cam: {fileID: 330585546}
+  playerSpeed: 6
+  cameraTransform: {fileID: 330585546}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 832575519}
-  - {fileID: 8835002954186025952}
   - {fileID: 330585546}
+  - {fileID: 8835002954186025952}
   - {fileID: 5127947803956120534}
   - {fileID: 2887488944291046585}
   - {fileID: 115238151473309271}
